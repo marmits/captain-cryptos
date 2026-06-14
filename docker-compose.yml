@@ -2,13 +2,23 @@ services:
   crypto-assistant:
     build: .
     container_name: crypto-assistant
+
     restart: unless-stopped
 
     env_file:
       - .env
 
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data:rw
 
     environment:
       - TZ=Europe/Paris
+
+    security_opt:
+      - no-new-privileges:true
+
+    read_only: true
+
+    tmpfs:
+      - /tmp
+
