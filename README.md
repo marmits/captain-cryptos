@@ -1,15 +1,16 @@
-# 🚀 Captain Cryptos — Crypto Assistant V1
+# 🚀 Captain Cryptos — Lightweight Crypto Assistant
 
 Assistant crypto léger auto-hébergé avec Docker.
 
 Objectif :
 
-> Recevoir automatiquement un rapport crypto quotidien sur Discord et détecter des opportunités / mouvements de marché sans faire tourner de grosse IA locale.
+> Recevoir automatiquement un rapport crypto quotidien sur Discord et détecter des opportunités / mouvements de marché sans faire tourner une grosse IA locale.
 
-Projet pensé pour :
+Pensé pour :
 
 - Ubuntu
 - Docker / Docker Compose
+- VPS
 - VM Proxmox
 - faible consommation ressources
 - exécution 24/7
@@ -18,45 +19,83 @@ Projet pensé pour :
 
 # ✨ Fonctionnalités
 
-## Rapport quotidien Discord
+## 📊 Rapport crypto Discord
 
-Tous les jours à **07:30** :
+Le bot envoie automatiquement un rapport complet :
 
-- Fear & Greed Index
-- Prix EUR + USD
-- variation 24h
-- variation 7 jours
-- score opportunité personnalisé
+- ✅ au démarrage du container
+- ✅ tous les jours à **07:30**
+- ✅ prix **EUR + USD**
+- ✅ Fear & Greed Index
+- ✅ contexte macro crypto
+- ✅ score opportunité
+- ✅ date / heure du rapport
+
+### Détails
+
+- ✔ Rapport au démarrage container
+- ✔ Rapport quotidien 07:30
+- ✔ Alertes toutes les 30 min
+- ✔ Pump >= +10%
+- ✔ Dump <= -7%
+- ✔ Anti-spam
+- ✔ Reset automatique
+- ✔ Macro contexte crypto
+- ✔ Score opportunité
+- ✔ Docker autonome
+- ✔ Pas besoin de cron
+- ✔ Redémarrage auto VPS
+
 
 Exemple :
 
 ```txt
 📊 Rapport Crypto
+🕒 15/06/2026 • 07:30
 
 🌍 Marché
 Fear & Greed : 18 (Extreme Fear)
 
+🟢 Contexte
+Marché en peur extrême.
+DCA progressif renforcé possible.
+
+📈 Macro
+
+₿ BTC dominance : 56.58%
+→ BTC reste dominant
+
+💵 Stable dominance : 11.53%
+→ Beaucoup de liquidités en attente
+
+📊 Volume global : 51.2B $
+→ Activité correcte
+
 ━━━━━━━━━━━━━━
 BTC
-💰 Prix : 55 756 € / 64 504 $
-📈 24h : +1.11%
-📊 7j : +2.71%
-🎯 Score : 74/100
-➡ 🟢 DCA progressif intéressant
+💰 Prix : 55 333 € / 64 013 $
+📈 24h : -0.38%
+📊 7j : +3.47%
+🎯 Score : 78/100
+➡ 🟡 Contexte plutôt favorable
 ````
 
 ---
 
-## Alertes marché
+## 🚨 Alertes marché automatiques
 
-Vérification automatique toutes les **30 minutes**.
+Le bot vérifie le marché toutes les :
+
+```txt
+30 minutes
+```
 
 ### 🚀 Pump
 
 Détection :
 
 ```txt
-+10% ou plus en 24h
+>= +10% en 24h
 ```
 
 Exemple :
@@ -72,12 +111,14 @@ Forte hausse détectée
 ➡ Prudence FOMO
 ```
 
+---
+
 ### 🚨 Dump
 
 Détection :
 
 ```txt
--7% ou plus en 24h
+<= -7% en 24h
 ```
 
 Exemple :
@@ -92,9 +133,9 @@ Forte baisse détectée
 
 ---
 
-## Anti-spam Discord
+## 🔇 Anti-spam Discord
 
-Le projet mémorise les alertes déjà envoyées via :
+Le projet mémorise les alertes envoyées dans :
 
 ```txt
 data/state.json
@@ -108,26 +149,156 @@ data/state.json
 🚀 HYPE
 ```
 
-toutes les 30 min.
+toutes les 30 minutes.
 
----
+### Reset automatique
 
-## Résistance API
-
-Gestion des erreurs :
-
-* API indisponible
-* timeout
-* CoinGecko rate limit (429)
-
-Le container continue de tourner.
-
----
-
-# 📂 Architecture du projet
+Quand une crypto revient en zone normale :
 
 ```txt
-MVP_crypto/
+-7% < variation < +10%
+```
+
+le système réarme automatiquement les alertes.
+
+Exemple :
+
+```txt
+HYPE +12%
+→ alerte envoyée
+
+HYPE +4%
+→ reset
+
+HYPE +11%
+→ nouvelle alerte possible
+```
+
+---
+
+## 🌍 Macro contexte crypto
+
+Le rapport intègre :
+
+### Fear & Greed Index
+
+Sentiment global du marché :
+
+```txt
+0 → peur extrême
+100 → euphorie extrême
+```
+
+Exemple :
+
+```txt
+Fear = 18
+→ marché stressé
+→ DCA progressif potentiellement plus intéressant
+```
+
+---
+
+### ₿ BTC Dominance
+
+Part du marché détenue par Bitcoin.
+
+Permet d’estimer si :
+
+```txt
+BTC domine
+ou
+altcoins dominent
+```
+
+Lecture simple :
+
+```txt
+> 55%
+→ BTC reste fort
+
+< 53%
+→ rotation altcoins possible
+```
+
+---
+
+### 💵 Stablecoin Dominance
+
+Mesure les liquidités encore en attente :
+
+```txt
+USDT
+USDC
+DAI
+FDUSD
+USDe
+```
+
+Lecture :
+
+```txt
+élevée
+→ cash encore disponible
+
+faible
+→ marché déjà très investi
+```
+
+---
+
+### 📊 Volume global marché
+
+Mesure l’activité du marché crypto.
+
+Exemple :
+
+```txt
+volume élevé
+→ mouvements plus crédibles
+
+volume faible
+→ marché calme
+```
+
+---
+
+# 🧠 Score opportunité
+
+Score :
+
+```txt
+0 → mauvais timing
+100 → contexte plus favorable
+```
+
+Le score prend en compte :
+
+* Fear & Greed
+* variation 24h
+* variation 7 jours
+* distance au plus haut historique (ATH)
+* bonus stabilité BTC/ETH
+
+Exemple :
+
+```txt
+🎯 Score : 82/100
+➡ 🟢 DCA progressif intéressant
+```
+
+Le score n’est **pas un conseil financier**.
+
+Il sert à :
+
+> réduire le FOMO et améliorer le timing DCA.
+
+---
+
+# ⚙️ Architecture
+
+```txt
+captain-cryptos/
 │
 ├── app/
 │   ├── alerts.py
@@ -144,12 +315,13 @@ MVP_crypto/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── requirements.txt
+├── .env.example
 └── README.md
 ```
 
 ---
 
-## Rôle des fichiers
+## 📂 Rôle des fichiers
 
 ### `main.py`
 
@@ -168,19 +340,24 @@ Responsable de :
 Connexion APIs :
 
 * CoinGecko
-* Fear & Greed Index
+* Alternative.me Fear & Greed
 
 Responsable de :
 
 * prix crypto
+* macro contexte
 * formatage EUR/USD
-* données marché
 
 ---
 
 ### `report.py`
 
-Construit le rapport Discord.
+Construit le rapport Discord :
+
+* mise en forme
+* contexte marché
+* macro lecture
+* score opportunité
 
 ---
 
@@ -190,18 +367,14 @@ Détection :
 
 * pump
 * dump
-
-- anti-doublon.
+* anti-spam
+* reset automatique
 
 ---
 
 ### `scoring.py`
 
-Calcule le **score opportunité**.
-
-But :
-
-> aider à éviter FOMO et améliorer le timing DCA.
+Calcule le score opportunité.
 
 ---
 
@@ -218,6 +391,7 @@ Configuration globale :
 * watchlist
 * horaires
 * seuils alertes
+* timezone
 
 ---
 
@@ -243,33 +417,49 @@ TZ=Europe/Paris
 
 ---
 
-# 🐳 Lancement Docker
+## `.env.example`
 
-Build + démarrage :
+À versionner dans Git :
+
+```env
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/xxx
+
+WATCHLIST=bitcoin,ethereum,hyperliquid,akash-network,aethir
+
+REPORT_HOUR=07
+
+TZ=Europe/Paris
+```
+
+---
+
+# 🐳 Docker
+
+### Build + démarrage
 
 ```bash
 docker compose up -d --build
 ```
 
-Voir logs :
+---
+
+### Logs
 
 ```bash
 docker logs -f crypto-assistant
 ```
 
-Containers actifs :
+---
 
-```bash
-docker ps
-```
-
-Restart :
+### Restart
 
 ```bash
 docker restart crypto-assistant
 ```
 
-Stop :
+---
+
+### Stop
 
 ```bash
 docker compose down
@@ -277,7 +467,39 @@ docker compose down
 
 ---
 
-# 🔧 Variables importantes
+## 🔁 Fonctionnement autonome
+
+Une fois lancé :
+
+```bash
+docker compose up -d
+```
+
+Le bot fonctionne seul :
+
+* rapport immédiat au démarrage
+* rapport quotidien 07:30
+* alertes marché toutes les 30 min
+
+Grâce à :
+
+```yaml
+restart: unless-stopped
+```
+
+le container redémarre automatiquement après reboot VPS.
+
+### Aucun cron requis
+
+Le scheduler est intégré directement dans :
+
+```txt
+main.py
+```
+
+---
+
+# 🔧 Personnalisation
 
 ## Modifier heure du rapport
 
@@ -287,7 +509,9 @@ Dans :
 REPORT_HOUR=08
 ```
 
-→ rapport envoyé à :
+↓
+
+rapport envoyé à :
 
 ```txt
 08:30
@@ -305,28 +529,19 @@ WATCHLIST=bitcoin,ethereum,solana
 
 ---
 
-# 🧠 Score Opportunité
+## Modifier seuils alertes
 
-Score :
+Dans :
 
 ```txt
-0 → mauvais timing
-100 → contexte plus favorable
+app/config.py
 ```
-
-Le score prend en compte :
-
-* Fear & Greed
-* variation 24h
-* variation 7 jours
-* distance au plus haut historique
-* bonus stabilité BTC/ETH
 
 Exemple :
 
-```txt
-🎯 Score : 82/100
-➡ 🟢 DCA progressif intéressant
+```python
+PUMP_THRESHOLD = 8
+DUMP_THRESHOLD = -5
 ```
 
 ---
@@ -337,18 +552,18 @@ Exemple :
 
 **Dollar Cost Averaging**
 
-Acheter progressivement au lieu d’investir tout d’un coup.
+Acheter progressivement.
 
 Exemple :
 
 ```txt
-100 €/mois en BTC
+100 €/mois BTC
 ```
 
-Plutôt que :
+au lieu de :
 
 ```txt
-1200 € en une fois
+1200 € d’un coup
 ```
 
 ---
@@ -357,13 +572,13 @@ Plutôt que :
 
 **Fear Of Missing Out**
 
-Acheter dans la panique d’un pump :
+Acheter dans l’émotion.
+
+Exemple :
 
 ```txt
-"ça monte vite je vais rater le train"
+“ça pump je vais rater le train”
 ```
-
-Souvent mauvais timing.
 
 ---
 
@@ -371,36 +586,7 @@ Souvent mauvais timing.
 
 **All Time High**
 
-Plus haut prix historique d’une crypto.
-
-Exemple :
-
-```txt
-BTC ATH ≈ 109k $
-```
-
----
-
-## Fear & Greed Index
-
-Indice de sentiment du marché.
-
-Échelle :
-
-```txt
-0 → peur extrême
-100 → euphorie extrême
-```
-
-En général :
-
-```txt
-Fear élevé
-→ souvent plus intéressant pour DCA
-
-Greed élevé
-→ prudence FOMO
-```
+Plus haut historique.
 
 ---
 
@@ -409,7 +595,7 @@ Greed élevé
 Hausse rapide :
 
 ```txt
-+10% en quelques heures
++10%
 ```
 
 ---
@@ -441,29 +627,25 @@ HYPE
 
 ## Bull Market
 
-Marché haussier.
-
-Le marché monte sur plusieurs mois.
+Marché haussier long.
 
 ---
 
 ## Bear Market
 
-Marché baissier.
-
-Correction longue.
+Marché baissier long.
 
 ---
 
 ## HODL
 
-Garder ses cryptos longtemps malgré volatilité.
+Conserver ses cryptos long terme.
 
 ---
 
 ## Perpetuals / Perps
 
-Trading avec :
+Trading :
 
 * Long
 * Short
@@ -473,7 +655,9 @@ Très risqué.
 
 Exemple :
 
-Hyperliquid.
+```txt
+Hyperliquid
+```
 
 ---
 
@@ -485,16 +669,22 @@ Hyperliquid.
 * alertes marché
 * score opportunité
 * EUR/USD
+* macro contexte
 * Docker
 * anti-spam
+* reset automatique
+
+---
 
 ## V2
 
-* score plus intelligent
 * historique SQLite
-* tendances IA crypto
+* score plus intelligent
 * alertes personnalisées
-* résumé marché automatique
+* watchlist dynamique
+* résumé marché enrichi
+
+---
 
 ## V3 (agentique)
 

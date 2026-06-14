@@ -2,6 +2,11 @@ import json
 import os
 import requests
 
+from config import (
+    PUMP_THRESHOLD,
+    DUMP_THRESHOLD
+)
+
 STATE_FILE = "/app/data/state.json"
 
 
@@ -13,13 +18,16 @@ def load_state():
         return {}
 
     try:
+
         with open(
             STATE_FILE,
             "r"
         ) as f:
+
             return json.load(f)
 
     except Exception:
+
         return {}
 
 
@@ -29,6 +37,7 @@ def save_state(state):
         STATE_FILE,
         "w"
     ) as f:
+
         json.dump(
             state,
             f
@@ -72,7 +81,9 @@ def check_alerts(
         message = None
 
         # DUMP
-        if change_24h <= -7:
+
+        if ( change_24h <= DUMP_THRESHOLD ):
+
 
             alert_type = "dump"
 
@@ -91,7 +102,7 @@ def check_alerts(
             )
 
         # PUMP
-        elif change_24h >= 10:
+        elif ( change_24h >= PUMP_THRESHOLD ):
 
             alert_type = "pump"
 
@@ -108,8 +119,6 @@ def check_alerts(
                 "━━━━━━━━━━━━━━"
             )
 
-
-
         # éviter doublons
         if (
             alert_type
@@ -118,6 +127,7 @@ def check_alerts(
         ):
             continue
 
+        # envoyer alerte
         if alert_type:
 
             try:
@@ -125,12 +135,24 @@ def check_alerts(
                 requests.post(
                     webhook_url,
                     json={
-                        "content": message
+                        "content":
+                        message
                     },
                     timeout=10
                 )
-                # mémoriser alerte envoyée 
-                state[symbol] = ( 
+
+                print(
+                    f"Alerte "
+                    f"{alert_type} "
+                    f"envoyée "
+                    f"pour "
+                    f"{symbol}"
+                )
+
+                # mémoriser état
+                state[
+                    symbol
+                ] = (
                     alert_type
                 )
 
@@ -138,6 +160,24 @@ def check_alerts(
 
                 print(
                     f"Alert Discord error: {e}"
+                )
+
+        # reset état si retour normal
+        else:
+
+            if (
+                symbol
+                in state
+            ):
+
+                print(
+                    f"Reset alerte "
+                    f"{symbol}"
+                )
+
+                state.pop(
+                    symbol,
+                    None
                 )
 
     save_state(state)

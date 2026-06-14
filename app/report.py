@@ -1,3 +1,6 @@
+from datetime import (
+    datetime
+)
 
 from config import (
     WATCHLIST
@@ -186,9 +189,19 @@ def build_report(
         ]
     )
 
-    report = (
-        "📊 **Rapport Crypto**\n\n"
+
+    report_time = (
+        datetime.now()
+        .strftime(
+            "%d/%m/%Y • %H:%M"
+        )
     )
+
+    report = (
+        "📊 **Rapport Crypto**\n"
+        f"🕒 {report_time}\n\n"
+    )
+
 
     market_context = (
         get_market_context(
