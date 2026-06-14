@@ -1,9 +1,9 @@
+
 from config import (
     WATCHLIST
 )
 
 from market import (
-    get_fear_greed,
     format_price
 )
 
@@ -62,22 +62,143 @@ def get_market_context(
     )
 
 
-def build_report(
-    market_data
+def format_market_volume(
+    volume
 ):
 
-    fear_value, fear_label = (
-        get_fear_greed()
+    if volume >= 1_000_000_000:
+
+        return (
+            f"{volume / 1_000_000_000:.1f}B $"
+        )
+
+    return (
+        f"{volume:,.0f} $"
+    )
+
+
+def get_macro_comment(
+    macro_data
+):
+
+    btc_dom = (
+        macro_data[
+            "btc_dominance"
+        ]
+    )
+
+    stable_dom = (
+        macro_data[
+            "stable_dominance"
+        ]
+    )
+
+    volume = (
+        macro_data[
+            "global_volume_usd"
+        ]
+    )
+
+    # BTC dominance
+    if btc_dom >= 60:
+
+        btc_comment = (
+            "→ BTC domine "
+            "fortement le marché"
+        )
+
+    elif btc_dom >= 55:
+
+        btc_comment = (
+            "→ BTC reste dominant"
+        )
+
+    else:
+
+        btc_comment = (
+            "→ Rotation altcoins "
+            "possible"
+        )
+
+    # Stable dominance
+    if stable_dom >= 10:
+
+        stable_comment = (
+            "→ Beaucoup de "
+            "liquidités en attente"
+        )
+
+    else:
+
+        stable_comment = (
+            "→ Argent déjà "
+            "largement investi"
+        )
+
+    # Volume
+    if volume >= 100_000_000_000:
+
+        volume_comment = (
+            "→ Marché très actif"
+        )
+
+    elif volume >= 50_000_000_000:
+
+        volume_comment = (
+            "→ Activité correcte"
+        )
+
+    else:
+
+        volume_comment = (
+            "→ Marché plutôt calme"
+        )
+
+    return (
+        f"₿ **BTC dominance** : "
+        f"{btc_dom:.2f}%\n"
+        f"{btc_comment}\n\n"
+
+        f"💵 **Stable dominance** : "
+        f"{stable_dom:.2f}%\n"
+        f"{stable_comment}\n\n"
+
+        f"📊 **Volume global** : "
+        f"{format_market_volume(volume)}\n"
+        f"{volume_comment}\n"
+    )
+
+
+def build_report(
+    market_data,
+    macro_data
+):
+
+    fear_value = (
+        macro_data[
+            "fear_value"
+        ]
+    )
+
+    fear_label = (
+        macro_data[
+            "fear_label"
+        ]
     )
 
     report = (
         "📊 **Rapport Crypto**\n\n"
     )
 
-
     market_context = (
         get_market_context(
             fear_value
+        )
+    )
+
+    macro_comment = (
+        get_macro_comment(
+            macro_data
         )
     )
 
@@ -87,9 +208,9 @@ def build_report(
         f"**{fear_value}** "
         f"({fear_label})\n\n"
         f"{market_context}\n"
+        f"📈 **Macro**\n\n"
+        f"{macro_comment}\n"
     )
-
-
 
     separator = (
         "━━━━━━━━━━━━━━\n"

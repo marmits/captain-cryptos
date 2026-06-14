@@ -52,6 +52,7 @@ from config import (
 
 from market import (
     get_market_data,
+    get_macro_data,
     format_price
 )
 
@@ -86,11 +87,18 @@ def send_report():
 
         return
 
+
+    macro_data = (
+        get_macro_data()
+    )
+
     report = (
         build_report(
-            market_data
+            market_data,
+            macro_data
         )
     )
+
 
     print(report)
 

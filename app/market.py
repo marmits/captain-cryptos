@@ -5,35 +5,6 @@ from config import (
 )
 
 
-def get_fear_greed():
-
-    try:
-
-        response = requests.get(
-            "https://api.alternative.me/fng/?limit=1",
-            timeout=10
-        )
-
-        data = response.json()[
-            "data"
-        ][0]
-
-        return (
-            data["value"],
-            data[
-                "value_classification"
-            ]
-        )
-
-    except Exception as e:
-
-        print(
-            f"Fear & Greed error: {e}"
-        )
-
-        return "?", "Unknown"
-
-
 def get_market_data():
 
     ids = ",".join(
@@ -154,6 +125,173 @@ def get_eur_prices():
         )
 
         return {}
+
+
+def get_macro_data():
+
+    try:
+
+        # Fear & Greed
+        fear_response = requests.get(
+            "https://api.alternative.me/fng/?limit=1",
+            timeout=10
+        )
+
+        fear_data = (
+            fear_response.json()
+            ["data"][0]
+        )
+
+        fear_value = int(
+            fear_data["value"]
+        )
+
+        fear_label = (
+            fear_data[
+                "value_classification"
+            ]
+        )
+
+        # CoinGecko Global
+        cg_response = requests.get(
+            "https://api.coingecko.com/api/v3/global",
+            timeout=10
+        )
+
+        if (
+            cg_response.status_code
+            == 429
+        ):
+
+            print(
+                "CoinGecko macro "
+                "rate limit"
+            )
+
+            return {}
+
+        cg_response.raise_for_status()
+
+        data = (
+            cg_response.json()
+            ["data"]
+        )
+
+        # BTC dominance
+        btc_dominance = (
+            data[
+                "market_cap_percentage"
+            ].get(
+                "btc",
+                0
+            )
+        )
+
+        # Global volume
+        global_volume = (
+            data[
+                "total_volume"
+            ].get(
+                "usd",
+                0
+            )
+        )
+
+        # Stablecoin dominance
+        stablecoins = [
+            "usdt",
+            "usdc",
+            "dai",
+            "fdusd",
+            "usde"
+        ]
+
+        stable_dominance = 0
+
+        for stable in stablecoins:
+
+            stable_dominance += (
+                data[
+                    "market_cap_percentage"
+                ].get(
+                    stable,
+                    0
+                )
+            )
+
+        # DXY
+        # DXY (désactivé V1)
+        #dxy = get_dxy()
+        dxy = None
+        
+
+        return {
+
+            "fear_value":
+            fear_value,
+
+            "fear_label":
+            fear_label,
+
+            "btc_dominance":
+            round(
+                btc_dominance,
+                2
+            ),
+
+            "global_volume_usd":
+            round(
+                global_volume,
+                0
+            ),
+
+            "stable_dominance":
+            round(
+                stable_dominance,
+                2
+            ),
+
+            "dxy":
+            dxy
+        }
+
+    except Exception as e:
+
+        print(
+            f"Macro error: {e}"
+        )
+
+        return {}
+
+
+def get_dxy():
+
+    try:
+
+        response = requests.get(
+            "https://stooq.com/q/l/?s=dx.f&f=sd2t2ohlcv&h&e=json",
+            timeout=10
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        return float(
+            data[
+                "symbols"
+            ][0][
+                "close"
+            ]
+        )
+
+    except Exception as e:
+
+        print(
+            f"DXY error: {e}"
+        )
+
+        return None
 
 
 def format_price(
