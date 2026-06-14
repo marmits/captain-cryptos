@@ -13,6 +13,55 @@ from scoring import (
 )
 
 
+def get_market_context(
+    fear_value
+):
+
+    fear_value = int(
+        fear_value
+    )
+
+    if fear_value <= 25:
+
+        return (
+            "🟢 **Contexte**\n"
+            "Marché en peur extrême.\n"
+            "DCA progressif "
+            "renforcé possible.\n"
+        )
+
+    elif fear_value <= 45:
+
+        return (
+            "🟡 **Contexte**\n"
+            "Marché prudent.\n"
+            "DCA normal "
+            "possible.\n"
+        )
+
+    elif fear_value <= 65:
+
+        return (
+            "🟠 **Contexte**\n"
+            "Marché neutre.\n"
+            "Rester sélectif.\n"
+        )
+
+    elif fear_value <= 80:
+
+        return (
+            "🔴 **Contexte**\n"
+            "Marché euphorique.\n"
+            "Prudence FOMO.\n"
+        )
+
+    return (
+        "🚨 **Contexte**\n"
+        "Euphorie extrême.\n"
+        "Réduire le DCA.\n"
+    )
+
+
 def build_report(
     market_data
 ):
@@ -25,12 +74,22 @@ def build_report(
         "📊 **Rapport Crypto**\n\n"
     )
 
+
+    market_context = (
+        get_market_context(
+            fear_value
+        )
+    )
+
     report += (
         f"🌍 **Marché**\n"
         f"Fear & Greed : "
         f"**{fear_value}** "
         f"({fear_label})\n\n"
+        f"{market_context}\n"
     )
+
+
 
     separator = (
         "━━━━━━━━━━━━━━\n"
