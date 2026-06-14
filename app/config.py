@@ -12,6 +12,20 @@ DISCORD_WEBHOOK_URL = os.getenv(
     "DISCORD_WEBHOOK_URL"
 )
 
+DISCORD_BOT_TOKEN = os.getenv(
+    "DISCORD_BOT_TOKEN"
+)
+
+
+# ==========================================
+# COINGECKO
+# ==========================================
+
+
+COINGECKO_API_KEY = os.getenv(
+    "COINGECKO_API_KEY"
+)
+
 # ==========================================
 # Crypto mapping
 # ==========================================

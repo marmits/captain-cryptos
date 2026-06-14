@@ -1,8 +1,74 @@
 import requests
+import time
 
 from config import (
-    WATCHLIST
+    WATCHLIST,
+    COINGECKO_API_KEY
 )
+
+HEADERS = {
+    "User-Agent":
+    "CaptainCryptos/1.0"
+}
+
+
+def safe_get(
+    url,
+    params=None
+):
+
+    for attempt in range(2):
+
+        try:
+
+            headers = HEADERS.copy()
+
+            if (
+                COINGECKO_API_KEY
+                and "coingecko.com"
+                in url
+            ):
+
+                headers[
+                    "x-cg-demo-api-key"
+                ] = (
+                    COINGECKO_API_KEY
+                )
+
+            response = requests.get(
+                url,
+                params=params,
+                headers=headers,
+                timeout=10
+            )
+
+            if (
+                response.status_code
+                == 429
+            ):
+
+                print(
+                    "Rate limit API "
+                    f"(tentative {attempt+1})"
+                )
+
+                time.sleep(2)
+
+                continue
+
+            response.raise_for_status()
+
+            return response
+
+        except Exception as e:
+
+            print(
+                f"Request error: {e}"
+            )
+
+            time.sleep(2)
+
+    return None
 
 
 def get_market_data():
@@ -24,59 +90,39 @@ def get_market_data():
         "precision": "full"
     }
 
-    try:
+    response = safe_get(
+        url,
+        params
+    )
 
-        response = requests.get(
-            url,
-            params=params,
-            timeout=10
-        )
-
-        if (
-            response.status_code
-            == 429
-        ):
-
-            print(
-                "CoinGecko rate limit"
-            )
-
-            return []
-
-        response.raise_for_status()
-
-        market_data = (
-            response.json()
-        )
-
-        eur_prices = (
-            get_eur_prices()
-        )
-
-        for coin in market_data:
-
-            coin_id = coin["id"]
-
-            if (
-                coin_id
-                in eur_prices
-            ):
-
-                coin[
-                    "eur_price"
-                ] = eur_prices[
-                    coin_id
-                ]["eur"]
-
-        return market_data
-
-    except Exception as e:
-
-        print(
-            f"Market data error: {e}"
-        )
+    if not response:
 
         return []
+
+    market_data = (
+        response.json()
+    )
+
+    eur_prices = (
+        get_eur_prices()
+    )
+
+    for coin in market_data:
+
+        coin_id = coin["id"]
+
+        if (
+            coin_id
+            in eur_prices
+        ):
+
+            coin[
+                "eur_price"
+            ] = eur_prices[
+                coin_id
+            ]["eur"]
+
+    return market_data
 
 
 def get_eur_prices():
@@ -95,36 +141,20 @@ def get_eur_prices():
         "eur"
     }
 
-    try:
+    response = safe_get(
+        url,
+        params
+    )
 
-        response = requests.get(
-            url,
-            params=params,
-            timeout=10
-        )
-
-        if (
-            response.status_code
-            == 429
-        ):
-
-            print(
-                "EUR API rate limit"
-            )
-
-            return {}
-
-        response.raise_for_status()
-
-        return response.json()
-
-    except Exception as e:
+    if not response:
 
         print(
-            f"EUR prices error: {e}"
+            "EUR API rate limit"
         )
 
         return {}
+
+    return response.json()
 
 
 def get_macro_data():
@@ -132,10 +162,13 @@ def get_macro_data():
     try:
 
         # Fear & Greed
-        fear_response = requests.get(
-            "https://api.alternative.me/fng/?limit=1",
-            timeout=10
+        fear_response = safe_get(
+            "https://api.alternative.me/fng/?limit=1"
         )
+
+        if not fear_response:
+
+            return {}
 
         fear_data = (
             fear_response.json()
@@ -152,16 +185,12 @@ def get_macro_data():
             ]
         )
 
-        # CoinGecko Global
-        cg_response = requests.get(
-            "https://api.coingecko.com/api/v3/global",
-            timeout=10
+        # CoinGecko global
+        cg_response = safe_get(
+            "https://api.coingecko.com/api/v3/global"
         )
 
-        if (
-            cg_response.status_code
-            == 429
-        ):
+        if not cg_response:
 
             print(
                 "CoinGecko macro "
@@ -170,14 +199,11 @@ def get_macro_data():
 
             return {}
 
-        cg_response.raise_for_status()
-
         data = (
             cg_response.json()
             ["data"]
         )
 
-        # BTC dominance
         btc_dominance = (
             data[
                 "market_cap_percentage"
@@ -187,7 +213,6 @@ def get_macro_data():
             )
         )
 
-        # Global volume
         global_volume = (
             data[
                 "total_volume"
@@ -197,7 +222,6 @@ def get_macro_data():
             )
         )
 
-        # Stablecoin dominance
         stablecoins = [
             "usdt",
             "usdc",
@@ -219,11 +243,7 @@ def get_macro_data():
                 )
             )
 
-        # DXY
-        # DXY (désactivé V1)
-        #dxy = get_dxy()
         dxy = None
-        
 
         return {
 
@@ -268,12 +288,13 @@ def get_dxy():
 
     try:
 
-        response = requests.get(
-            "https://stooq.com/q/l/?s=dx.f&f=sd2t2ohlcv&h&e=json",
-            timeout=10
+        response = safe_get(
+            "https://stooq.com/q/l/?s=dx.f&f=sd2t2ohlcv&h&e=json"
         )
 
-        response.raise_for_status()
+        if not response:
+
+            return None
 
         data = response.json()
 
@@ -339,3 +360,4 @@ def format_price(
         f"{formatted} "
         f"{symbol}"
     )
+

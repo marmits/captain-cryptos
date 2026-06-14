@@ -3,9 +3,11 @@ FROM python:3.13-slim
 WORKDIR /app
 
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
+COPY start.sh .
 
-CMD ["python", "-u", "app/main.py"]
+RUN chmod +x start.sh
+
+CMD ["sh", "start.sh"]
