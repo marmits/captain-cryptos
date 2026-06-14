@@ -1,26 +1,29 @@
 # Instructions
-Creer un Webhooks sur discord
-- clique droit sur le server choisit
-- parametres du serveur -> intégrations -> webhook
+## Discord
+Créer un Webhooks sur discord.
+- Clique droit sur le serveur
+- Paramètres du serveur -> intégrations -> webhook
 - Choisir le salon de destination.
+- Créer/Compléter `.env` (Ex: `.env.exemple`)
 
 https://discord.com/api/webhooks/xxx/xxx-xxx
 
-* docker compose down
-* docker compose up -d --build
+## Docker
+* `docker compose down`
+* `docker compose up -d --build`
 	- Rebuild l’image Docker. (si modifications)
-* docker logs -f crypto-assistant => affiche ce que la salon discord recevra.
+* `docker logs -f crypto-assistant` => affiche ce que la salon discord recevra.
 
-################
-→ rapport complet Discord au demarrage container et à 7h30 tous les jours
+---
+→ Rapport complet Discord au demarrage container et à 7h30 tous les jours
 
 + Toutes les 30 min (alertes)
 
 → seulement si :
 
-pump >= +10%
-dump <= -7%
-################################
+- pump >= +10%
+- dump <= -7%
+---
 
 
 ## Contextes MACRO avec api gratuites (utilisés dans les scripts)
