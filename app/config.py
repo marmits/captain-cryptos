@@ -35,6 +35,7 @@ SYMBOL_MAPPING = {
     "ethereum": "ETH",
     "hyperliquid": "HYPE",
     "solana": "SOL",
+    "ripple": "XRP",
     "akash-network": "AKT",
     "aethir": "ATH"
 }
