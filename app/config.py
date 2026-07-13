@@ -36,6 +36,10 @@ SYMBOL_MAPPING = {
     "hyperliquid": "HYPE",
     "solana": "SOL",
     "ripple": "XRP",
+    "aave": "AAVE",
+    "chainlink": "LINK",
+    "sui": "SUI",
+    "avalanche-2": "AVAX",
     "akash-network": "AKT",
     "aethir": "ATH"
 }

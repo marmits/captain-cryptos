@@ -408,7 +408,7 @@ Exemple :
 ```env
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/xxx
 
-WATCHLIST=bitcoin,ethereum,hyperliquid,solana,ripple,akash-network,aethir
+WATCHLIST=bitcoin,ethereum,hyperliquid,solana,ripple,aave,chainlink,sui,avalanche-2,akash-network,aethir
 
 REPORT_HOUR=07
 
@@ -424,7 +424,7 @@ TZ=Europe/Paris
 ```env
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/xxx
 
-WATCHLIST=bitcoin,ethereum,hyperliquid,solana,ripple,akash-network,aethir
+WATCHLIST=bitcoin,ethereum,hyperliquid,solana,ripple,aave,chainlink,sui,avalanche-2,akash-network,aethir
 
 REPORT_HOUR=07
 
@@ -524,7 +524,7 @@ rapport envoyé à :
 Exemple :
 
 ```env
-WATCHLIST=bitcoin,ethereum,solana,ripple
+WATCHLIST=bitcoin,ethereum,solana,ripple,aave,chainlink,sui,avalanche-2
 ```
 
 ---
@@ -689,4 +689,3 @@ Hyperliquid
 ## V3 (agentique)
 
 Assistant analyste crypto autonome.
-
