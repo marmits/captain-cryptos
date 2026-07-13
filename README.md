@@ -408,7 +408,7 @@ Exemple :
 ```env
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/xxx
 
-WATCHLIST=bitcoin,ethereum,hyperliquid,akash-network,aethir
+WATCHLIST=bitcoin,ethereum,hyperliquid,solana,akash-network,aethir
 
 REPORT_HOUR=07
 
@@ -424,7 +424,7 @@ TZ=Europe/Paris
 ```env
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/xxx
 
-WATCHLIST=bitcoin,ethereum,hyperliquid,akash-network,aethir
+WATCHLIST=bitcoin,ethereum,hyperliquid,solana,akash-network,aethir
 
 REPORT_HOUR=07
 
